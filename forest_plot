@@ -1,0 +1,57 @@
+# Aim: Create a forest plot for a meta-analysis (example)
+
+
+#Loading packages
+library(statmod)
+library(meta)
+library(metafor)
+library(lifecycle)
+library(readr)
+library(tidyverse)
+library(questionr)
+
+#############################
+# Create a data frame with the information from the table
+data <- data.frame(
+  studyid = c("Farran 2008", "Janssen 2021", "Merboth 2022", "Naf 2010", "Riedl 2001", "Tetteroo 1990"),
+  treat_events = c(4, 36, 5, 10, 11, 1),
+  treat_n = c(18, 179, 75, 134, 25, 56),
+  control_events = c(7, 117, 11, 17, 29, 2),
+  control_n = c(24, 317, 75, 68, 45, 58)
+)
+
+# Create a meta-analysis object for odds ratios
+meta_analysis <- metabin(
+  event.e = data$treat_events,    # Events in the treatment group
+  n.e = data$treat_n,             # Total number of participants in the treatment group
+  event.c = data$control_events,  # Events in the control group
+  n.c = data$control_n,           # Total number of participants in the control group
+  studlab = data$studyid,         # Study labels
+  sm = "OR",                      # Specify odds ratio as the effect measure
+  method = "Inverse"              # Use inverse variance method
+)
+
+# Create a forest plot for the meta-analysis
+forest(
+meta_analysis,
+sortvar = TE,                 # Sort the data by effect size (odds ratio)
+fixed = FALSE,                # Do not show the fixed-effect estimate
+random = TRUE,                # Show the random-effects estimate
+leftcols = c("studlab", "effect", "ci", "w.random"), # Display study labels on the left side of the plot - aangepast, meer kolommen links van forest plot weergeven
+leftlabs = c("Reference", "Odds Ratio", "95% CI", "Weights"),  # Label for the left columns - aangepast, labs toegevoegd voor alle kolommen links van forest plot
+rightcols = FALSE,            # geen kolommen weergeven aan rechterkant van forest plot - toegevoegd,
+rightlabs = NULL,             # Labels for the right-hand plot columns - weggehaald, geen kolommen rechts van forest plot (deze regel kan ook verwijderd worden)
+smlab = "Pneumonia",          # Label at the top of the plot
+xlab = "xlab",          # Label for the x-axis
+xlim = (c(0.04, 10)),            # Limits for the x-axis (logarithmic scale)
+fontsize = 10,                # Font size (in points)
+plotwidth = "6cm", 
+fs.xlab = 8,# Width of the plot area
+ff.xlab = "bold",
+colgap.forest.left = "1cm",   # Gap between left-hand column and plot
+digits = 2,                   # Number of significant digits for effects
+digits.se = 2,               # Number of significant digits for standard errors
+print.stat = T,
+layout = "RevMan5")
+
+# END
